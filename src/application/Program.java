@@ -1,6 +1,7 @@
 package application;
 
 import entities.Reservation;
+import exception.DomainException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -10,23 +11,19 @@ import java.util.Scanner;
 
 public class Program {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
 
-        Locale.setDefault(Locale.US);
         Scanner sc = new Scanner(System.in);
-
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.print("Room number: ");
-        int number = sc.nextInt();
-        System.out.print("Checkin date (dd/MM/yyyy): ");
-        Date checkin = sdf.parse(sc.next());
-        System.out.print("Checkout date (dd/MM/yyyy): ");
-        Date checkout = sdf.parse(sc.next());
+        try {
+            System.out.print("Room number: ");
+            int number = sc.nextInt();
+            System.out.print("Checkin date (dd/MM/yyyy): ");
+            Date checkin = sdf.parse(sc.next());
+            System.out.print("Checkout date (dd/MM/yyyy): ");
+            Date checkout = sdf.parse(sc.next());
 
-        if (!checkout.after(checkin)) {
-            System.out.println("Error in reservation; Checkout date must be after checkin date");
-        } else {
             Reservation reservation = new Reservation(number, checkin, checkout);
             System.out.println("Reservation: " + reservation);
 
@@ -37,18 +34,23 @@ public class Program {
             System.out.print("Checkout date (dd/MM/yyyy): ");
             checkout = sdf.parse(sc.next());
 
-
-            String error = reservation.updateDates(checkin, checkout);
-            if (error != null) {
-                System.out.println("Error in reservation: " + error);
-            } else {
-                System.out.println("Reservation: " + reservation);
-            }
-
-            sc.close();
-
-
+            reservation.updateDates(checkin, checkout);
+            System.out.println("Reservation: " + reservation);
         }
+        catch (ParseException e) {
+            System.out.println("Invalid date format");
+        }
+        catch (DomainException e) {
+            System.out.println("Error in reservtion: " + e.getMessage());
+        }
+        catch (RuntimeException e) {
+            System.out.println("Unexpected erro");
+        }
+
+        sc.close();
+
+
+
     }
 }
 
